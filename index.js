@@ -24,9 +24,9 @@ const userSchema =  new Schema({
     type: String
   },
   log: [{
-    description: String,
+    date: String,
     duration: Number,
-    date: String
+    description: String
   }],
   count: Number
 });
@@ -73,9 +73,9 @@ app.post('/api/users/:_id/exercises', async function(req, res) {
   const id = req.params._id;
 
   const exercise = {
-    description,
+    date,
     duration,
-    date
+    description
   }
 
   try {
