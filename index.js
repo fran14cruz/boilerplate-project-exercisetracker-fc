@@ -84,9 +84,32 @@ app.post('/api/users/:_id/exercises', async function(req, res) {
   } catch (err) {
     res.send(err);
   }
-
 });
 
+// get user's exercise log
+app.get('/api/users/:_id/logs', async function (req, res) {
+  const { from, to, limit } = req.query;
+
+  try {
+    const foundUser = await User.findById(req.params._id);
+    if (foundUser) {
+      if (from || to || limit) {
+        const logs = foundUser.log;
+        const filteredLogs = logs
+          .filter(log => {
+            const formattedLogDate = (new Date(log.date)).toISOString().split('T')[0]
+            return true
+          })
+        
+        const slicedLogs = limit ? filteredLogs.slice(0, limit) : filteredLogs
+        user.log = slicedLogs
+      }
+      res.json(foundUser);
+    }
+  } catch (err) {
+    res.send(err);
+  }
+});
 
 
 
