@@ -34,8 +34,9 @@ const userSchema =  new Schema({
 // create Model
 const User = mongoose.model('User', userSchema);
 
-// post user
-app.post('/api/users', async function(req, res) {
+// post user and get user(s)
+app.route('/api/users')
+  .post(async function(req, res) {
   const username = req.body.username;
   // create instance of User
   const user = new User({
@@ -52,7 +53,17 @@ app.post('/api/users', async function(req, res) {
   } catch (err) {
     res.send(err);
   }
-});
+})
+.get(async function(req, res) {
+  try {
+    const foundUsers = await User.find();
+    if (foundUsers) {
+      res.json(foundUsers);
+    }
+  } catch (err) {
+    res.send(err);
+  }
+})
 
 // post exercise
 app.post('/api/users/:_id/exercises', async function(req, res) {
