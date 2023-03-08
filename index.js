@@ -97,6 +97,54 @@ app.post('/api/users/:id/exercises', (req, res) => {
 });
 
 
+// get logs
+app.get('/api/users/:id/logs', (req, res) => {
+  const { from, to, limit } = req.query;
+  const { id } = req.params;
+  
+  User.findById(id, (err, userData) => {
+    if (err || !userData) {
+      res.send(err);
+    } else {
+      let dateObj = {}
+      if (from) {
+        dateObj['$gte'] = new Date(from);
+      }
+      if (to) {
+        dateObj['$lte'] = new Date(to);
+      }
+      let filter = {
+        userId: id
+      }
+      if (from || to ) {
+        filter.date = dateObj
+      }
+
+      let nonNullLimit = limit ?? 500;
+      Exercise.find(filter).limit(+nonNullLimit).exec((err, data) => {
+        if (err || !data) {
+          res.json([]);
+        } else{
+          const count = data.length;
+          const rawLog = data;
+          const { username, _id } = userData;
+          const log = rawLog.map((l) => ({
+            description: l.description,
+            duration: l.duration,
+            date: l.date.toDateString()
+          }))
+          res.json({
+            username:username,
+            count:count,
+            _id: _id.toString(),
+            log: log})
+        }
+      })
+    } 
+  })
+});
+
+
 
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port)
