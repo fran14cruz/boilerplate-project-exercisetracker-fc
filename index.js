@@ -44,19 +44,29 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html')
 });
 
-// post user
-app.post('/api/users', (req, res) => {
-  const newUser = new User({
-    username: req.body.username
+// post user and get users
+app.route('/api/users')
+  .post((req, res) => {
+    const newUser = new User({
+      username: req.body.username
+    })
+    newUser.save((err, data) => {
+      if (err || !data) {
+        res.send(err);
+      } else {
+        res.json(data);
+      }
+    })
   })
-  newUser.save((err, data) => {
-    if (err || !data) {
-      res.send(err);
-    } else {
-      res.json(data);
-    }
-  })
-});
+  .get((req, res) => {
+    User.find({}, (err, data) => {
+      if (!data) {
+        res.send('No users found');
+      } else {
+        res.json(data);
+      }
+    })
+  });
 
 // post exercises
 app.post('/api/users/:id/exercises', (req, res) => {
@@ -141,17 +151,6 @@ app.get('/api/users/:id/logs', (req, res) => {
         }
       })
     } 
-  })
-});
-
-// get users
-app.get("/api/users", (req, res) => {
-  User.find({}, (err, data) => {
-    if (!data) {
-      res.send('No data');
-    } else {
-      res.json(data);
-    }
   })
 });
 
