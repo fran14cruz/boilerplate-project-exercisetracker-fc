@@ -44,6 +44,59 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html')
 });
 
+// post user
+app.post('/api/users', (req, res) => {
+  const newUser = new User({
+    username: req.body.username
+  })
+  newUser.save((err, data) => {
+    if (err || !data) {
+      res.send(err);
+    } else {
+      res.json(data);
+    }
+  })
+});
+
+// post exercises
+app.post('/api/users/:id/exercises', (req, res) => {
+  const id = req.params.id;
+  let {description, duration, date} = req.body;
+
+  if (!date) {
+    date = new Date();
+  }
+  
+  User.findById(id, (err, userData) => {
+    if (err || !userData) {
+      res.send(err);
+    } else {
+      const newExercise = new Exercise({
+        userId: id, 
+        description,
+        duration,
+        date: new Date(date), 
+      });
+
+      newExercise.save((err, data) => {
+        if (err || !data) {
+          res.send(err);
+        } else {
+          const { description, duration, date, _id} = data;
+          res.json({
+            username: userData.username,
+            description: description,
+            duration: duration,
+            date: date.toDateString(),
+            _id: userData.id
+          });
+        }
+      })
+    }
+  })
+});
+
+
 
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port)
