@@ -144,7 +144,16 @@ app.get('/api/users/:id/logs', (req, res) => {
   })
 });
 
-
+// get users
+app.get("/api/users", (req, res) => {
+  User.find({}, (err, data) => {
+    if (!data) {
+      res.send('No data');
+    } else {
+      res.json(data);
+    }
+  })
+});
 
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port)
